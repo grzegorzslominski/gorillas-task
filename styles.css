@@ -1,0 +1,23 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+input[type="range"] {
+  width: 200px;
+}
