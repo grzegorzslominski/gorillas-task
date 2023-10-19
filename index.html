@@ -7,32 +7,75 @@
   </head>
   <body>
     <div class="controls">
-      <div class="slider-container">
-        <label for="valueSlider">u</label>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          value="1"
-          step="0.01"
-          id="u-slider"
-        />
-
+      <div class="lightControls">
+        <p>Light position</p>
+        <div class="slider-container">
+          <label for="valueSlider">x</label>
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            value="-5"
+            step="1"
+            id="x-light"
+          />
+        </div>
+        <div class="slider-container">
+          <label for="valueSlider">y</label>
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            value="-3"
+            step="1"
+            id="y-light"
+          />
+        </div>
+        <div class="slider-container">
+          <label for="valueSlider">z</label>
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            value="3"
+            step="1"
+            id="z-light"
+          />
+        </div>
       </div>
-      <div class="slider-container">
-        <label for="valueSlider">v</label>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          value="1"
-          step="0.01"
-          id="v-slider"
-        />
-      </div>
+      <div class="materials-container ">
+        <p>Box material</p>
+        <select id="box-select">
+          <option value="phong" selected="selected">Phong</option>
+          <option value="basic">Basic</option>
+          <option value="normal">Normal</option>
+          <option value="glass">Glass</option>
+          <option value="shader">Custom shader</option>
+        </select>
+      </div> 
+      <div class="materials-container ">
+        <p>Sphere material</p>
+        <select id="sphere-select">
+          <option value="phong">Phong</option>
+          <option value="standard" selected="basic">Basic</option>
+          <option value="normal">Normal</option>
+          <option value="glass">Glass</option>
+          <option value="shader">Custom shader</option>
+        </select>
+      </div> 
+      <div class="materials-container ">
+        <p>Cylinder material</p>
+        <select id="cylinder-select">
+          <option value="phong">Phong</option>
+          <option value="basic">Basic</option>
+          <option value="normal" selected="selected">Normal</option>
+          <option value="glass">Glass</option>
+          <option value="shader">Custom shader</option>
+        </select>
+      </div> 
+      
     </div>
     </div>
-
     <div id="canvas-container"></div>
     <script type="module" src="/main.js"></script>
   </body>

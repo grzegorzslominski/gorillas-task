@@ -1,78 +1,140 @@
 import * as THREE from "three";
-import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-const canvasContainer = document.getElementById("canvas-container");
-const width = canvasContainer.offsetWidth;
-const height = canvasContainer.offsetHeight;
+import { MATERIALS } from "./materials";
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-camera.position.z = 25;
+const cubeMap = new THREE.CubeTextureLoader()
+  .setPath("/assets/textures/cubeMap/")
+  .load(["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"]);
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(width, height);
-canvasContainer.appendChild(renderer.domElement);
+let scene;
+let camera;
+let renderer;
+let sceneObjects = [];
+let directionalLight;
 
-const controls = {
-  uValue: 1,
-  vValue: 1,
+const meshesDetails = {
+  box: {
+    geometry: new THREE.BoxGeometry(1, 1, 1),
+    material: MATERIALS.phong,
+    position: { x: -3, y: 1, z: 0 },
+  },
+  sphere: {
+    geometry: new THREE.SphereGeometry(0.75),
+    material: MATERIALS.basic,
+    position: { x: 0, y: 1, z: 0 },
+  },
+  cylinder: {
+    geometry: new THREE.CylinderGeometry(1, 1.25),
+    material: MATERIALS.shader,
+    position: { x: 4, y: 1, z: 0 },
+  },
 };
 
-const parametricFunction = (u, v, target) => {
-  u *= Math.PI * 2 * controls.uValue;
-  v *= Math.PI * 2 * controls.vValue;
-  target.set(u * Math.sin(v), u * Math.cos(v), v * Math.cos(u));
-};
+function adjustLighting() {
+  directionalLight = new THREE.DirectionalLight(0xdddddd);
+  directionalLight.position.set(-5, -3, 3);
+  directionalLight.castShadow = true;
 
-const geometry = new ParametricGeometry(parametricFunction, 25, 25);
-const material = new THREE.MeshBasicMaterial({
-  color: 0x00ff00,
-  side: THREE.DoubleSide,
-});
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
+  directionalLight.shadow.camera.left = -10;
+  directionalLight.shadow.camera.right = 10;
+  directionalLight.shadow.camera.top = 10;
+  directionalLight.shadow.camera.bottom = -10;
+  directionalLight.shadow.camera.near = 0.1;
+  directionalLight.shadow.camera.far = 1000;
 
-const changeControlValue = (controlType, value) => {
-  if (controlType === "u") {
-    controls.uValue = value;
-  } else {
-    controls.vValue = value;
-  }
-};
+  directionalLight.shadow.mapSize.width = 1024;
+  directionalLight.shadow.mapSize.height = 1024;
 
-const updateGeometry = (controlType, value) => {
-  changeControlValue(controlType, value);
-  const newGeometry = new ParametricGeometry(parametricFunction, 25, 25);
-  mesh.geometry.dispose();
-  mesh.geometry = newGeometry;
-  renderer.render(scene, camera);
-};
+  scene.add(directionalLight);
 
-const animate = () => {
-  window.requestAnimationFrame(animate);
-  mesh.rotation.x += 0.0025;
-  mesh.rotation.y += 0.0025;
-  renderer.render(scene, camera);
-};
+  let ambientLight = new THREE.AmbientLight(0xababab);
+  scene.add(ambientLight);
+}
 
-const addSlidersLogic = () => {
-  document.addEventListener("DOMContentLoaded", () => {
-    const uSlider = document.getElementById("u-slider");
-    const vSlider = document.getElementById("v-slider");
-
-    uSlider.addEventListener("input", (e) => {
-      updateGeometry("u", parseFloat(e.target.value));
-    });
-
-    vSlider.addEventListener("input", (e) => {
-      updateGeometry("v", parseFloat(e.target.value));
+function addLightSlidersLogic() {
+  const axes = ["x", "y", "z"];
+  axes.forEach((axis) => {
+    const axisSlider = document.getElementById(`${axis}-light`);
+    axisSlider.addEventListener("input", (e) => {
+      updateLightPosition(axis, parseFloat(e.target.value));
     });
   });
-};
+}
 
-const main = () => {
-  addSlidersLogic();
-  animate();
-};
+function updateLightPosition(axisType, value) {
+  directionalLight.position[axisType] = value;
+}
 
-main();
+function addMeshMaterialsLogic() {
+  const objectsKeys = Object.keys(meshesDetails);
+  objectsKeys.map((objectKey, index) => {
+    const objectMaterialSelect = document.getElementById(`${objectKey}-select`);
+    objectMaterialSelect.addEventListener("change", (e) => {
+      updateMaterial(index, e.target.value);
+    });
+  });
+}
+
+function updateMaterial(objectIndex, value) {
+  sceneObjects[objectIndex].material = MATERIALS[value];
+}
+
+function addObject(geometry, material, position) {
+  let mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(position.x, position.y, position.z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  scene.add(mesh);
+  sceneObjects.push(mesh);
+}
+
+function createObjects() {
+  Object.values(meshesDetails).map((objectDetails) => {
+    addObject(
+      objectDetails.geometry,
+      objectDetails.material,
+      objectDetails.position
+    );
+  });
+}
+
+function animationLoop() {
+  renderer.render(scene, camera);
+  sceneObjects.forEach((object) => {
+    object.rotation.x += 0.00125;
+    object.rotation.y += 0.00125;
+  });
+  requestAnimationFrame(animationLoop);
+}
+
+function init() {
+  scene = new THREE.Scene();
+  scene.background = cubeMap;
+  const canvasContainer = document.getElementById("canvas-container");
+  const width = canvasContainer.offsetWidth;
+  const height = canvasContainer.offsetHeight;
+
+  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setClearColor(0xa3a3a3);
+  renderer.shadowMap.enabled = true;
+  canvasContainer.appendChild(renderer.domElement);
+
+  const orbit = new OrbitControls(camera, renderer.domElement);
+  camera.position.set(0, 3, 5);
+  orbit.update();
+
+  const grid = new THREE.GridHelper(100, 100);
+  scene.add(grid);
+
+  adjustLighting();
+  addLightSlidersLogic();
+  addMeshMaterialsLogic();
+  createObjects();
+  animationLoop();
+}
+
+init();

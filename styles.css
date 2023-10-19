@@ -3,12 +3,14 @@ body {
   height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr;
+  color: white;
 }
 
 .controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 3rem;
+  background-color: rgb(43, 43, 43);
 }
 
 .slider-container {
@@ -20,4 +22,19 @@ body {
 
 input[type="range"] {
   width: 200px;
+}
+
+p {
+  margin: 0.5rem;
+  text-align: center;
+}
+
+.materials-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+select {
+  width: 8rem;
 }
