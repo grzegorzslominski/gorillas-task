@@ -12,7 +12,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "three": "^0.157.0"
+    "three": "^0.157.0",
+    "three-mesh-bvh": "^0.6.8"
   },
   "devDependencies": {
     "vite": "^4.4.11"
