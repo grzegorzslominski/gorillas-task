@@ -29,15 +29,15 @@ async function main() {
   const controls = new OrbitControls(camera, renderer.domElement);
 
   const environment = await new THREE.CubeTextureLoader().loadAsync([
-    "assets/whiteStudio/px.png",
-    "assets/whiteStudio/nx.png",
-    "assets/whiteStudio/py.png",
-    "assets/whiteStudio/ny.png",
-    "assets/whiteStudio/pz.png",
-    "assets/whiteStudio/nz.png",
+    "public/whiteStudio/px.png",
+    "public/whiteStudio/nx.png",
+    "public/whiteStudio/py.png",
+    "public/whiteStudio/ny.png",
+    "public/whiteStudio/pz.png",
+    "public/whiteStudio/nz.png",
   ]);
 
-  let diamondGeo = (await AssetManager.loadGLTFAsync("assets/diamond.glb"))
+  let diamondGeo = (await AssetManager.loadGLTFAsync("public/diamond.glb"))
     .scene.children[0].children[0].children[0].children[0].children[0].geometry;
 
   const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
